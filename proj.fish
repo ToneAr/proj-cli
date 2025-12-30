@@ -282,6 +282,18 @@ function _get_proj_path
 	set domain (_get_proj_domain $argv)
 	set project_name (_get_proj_name $argv)
 	set project_root (_get_proj_root $argv)
-	echo $project_root/$domain-project-$project_name
+	set domain_base (_get_domain_base $domain)
+	echo $project_root/$domain_base-$project_name
 end
 
+function _get_domain_base -a domain
+	if test "$domain" = "paclet"
+		echo "resource-paclet"
+		return
+	else if test "$domain" = "function"
+		echo "resource-function"
+		return
+	else
+		echo "$domain-project"
+	end
+end
