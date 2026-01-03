@@ -79,7 +79,9 @@ end
 
 function _edit_proj
 	_open_proj $argv
-	$EDITOR .
+	if test $status -eq 0
+		$EDITOR .
+	end
 end
 
 function _add_project
