@@ -248,10 +248,14 @@ end
 
 function _get_proj_domain
 	set domain
-	if test (count $argv) -eq 2
+	if test (count $argv) -eq 2; and not _knownCommandQ $argv[1]
 		set domain $argv[1]
-	else
+	else if test (count $argv) -eq 3; and _knownCommandQ $argv[1]
 		set domain $argv[2]
+	else if test (count $argv) -eq 3
+		set domain $argv[2]
+	else if test (count $argv) -ge 4
+		set domain $argv[3]
 	end
 	echo $domain
 end
