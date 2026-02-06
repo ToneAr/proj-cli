@@ -50,6 +50,15 @@ function proj
 	end
 end
 
+function _knownCommandQ -a cmd
+	switch $cmd
+		case 'help' 'h' 'edit' 'e' 'add' 'a' 'open' 'o' 'find' 'f' 'new' 'n' 'delete' 'd'
+			return 0
+		case '*'
+			return 1
+	end
+end
+
 # Help
 
 function _print_usage
@@ -276,10 +285,14 @@ end
 
 function _get_proj_name
 	set name
-	if test (count $argv) -eq 3
-		set name $argv[3]
-	else if test (count $argv) -eq 2
+	if test (count $argv) -eq 2; and not _knownCommandQ $argv[1]
 		set name $argv[2]
+	else if test (count $argv) -eq 3; and _knownCommandQ $argv[1]
+		set name $argv[3]
+	else if test (count $argv) -eq 3
+		set name $argv[3]
+	else if test (count $argv) -ge 4
+		set name $argv[4]
 	end
 	echo (string upper $name)
 end
