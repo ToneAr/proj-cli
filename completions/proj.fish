@@ -14,10 +14,13 @@ function __proj_domains
             echo $domain
         end
     end
-
-    # Add special domains
-    echo "function"
-    echo "paclet"
+	# Extract domain names for resource-* directories
+	for dir in $base_dir/resource-projects/resource-*
+        if test -d "$dir"
+            set -l domain (basename $dir | string replace -- 'resource-' '')
+            echo $domain
+        end
+    end
 end
 
 # Helper function to get projects for a given domain
