@@ -113,7 +113,11 @@ function _add_project
 		set_color normal
 		return 1
 	end
-	set git_url $argv[3]
+	if test "$argv[2]" = "resource"
+		set git_url $argv[4]
+	else
+		set git_url $argv[3]
+	end
 	set domain (_get_proj_domain $argv)
 	set project_path (_get_proj_path $domain $project_name)
 	if test -d $project_path
@@ -221,7 +225,9 @@ end
 
 function _search_proj
 	set search_term ""
-	if test (count $argv) -eq 3
+	if test (count $argv) -eq 4; and test "$argv[2]" = "resource"
+		set search_term $argv[4]
+	else if test (count $argv) -eq 3
 		set search_term $argv[3]
 	else if test (count $argv) -eq 2
 		set search_term $argv[2]
