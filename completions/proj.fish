@@ -14,13 +14,13 @@ function __proj_domains
             echo $domain
         end
     end
-	# Extract domain names for resource-* directories
-	for dir in $base_dir/resource-projects/resource-*
-        if test -d "$dir"
-            set -l domain (basename $dir | string replace -- 'resource-' '')
-            echo $domain
-        end
-    end
+    __proj_resource_types
+end
+
+# Helper function to get resource types supported by proj
+function __proj_resource_types
+    echo function
+    echo paclet
 end
 
 # Helper function to get projects for a given domain
@@ -86,6 +86,20 @@ function __proj_needs_domain
     return 1
 end
 
+# Helper to check if we're completing a type within the resource namespace
+function __proj_needs_resource_type
+    set -l cmd (commandline -opc)
+
+    if test (count $cmd) -eq 3; and test "$cmd[3]" = "resource"
+        switch $cmd[2]
+            case 'edit' 'e' 'add' 'a' 'open' 'o' 'find' 'f' 'new' 'n' 'delete' 'd'
+                return 0
+        end
+    end
+
+    return 1
+end
+
 # Helper to check if we're completing a project name
 function __proj_needs_project
     set -l cmd (commandline -opc)
@@ -105,7 +119,16 @@ function __proj_needs_project
     # proj <subcommand> <domain> <project>
     if test $count -eq 3
         switch $cmd[2]
-            case 'edit' 'e' 'open' 'o' 'find' 'f' 'new' 'n' 'delete' 'd'
+            case 'edit' 'e' 'open' 'o' 'find' 'f' 'delete' 'd'
+                test "$cmd[3]" != "resource"
+                return $status
+        end
+    end
+
+    # proj <subcommand> resource <type> <project>
+    if test $count -eq 4; and test "$cmd[3]" = "resource"
+        switch $cmd[2]
+            case 'edit' 'e' 'open' 'o' 'find' 'f' 'delete' 'd'
                 return 0
         end
     end
@@ -126,6 +149,9 @@ function __proj_get_domain
             case '*'
                 echo $cmd[2]
         end
+    else if test $count -ge 4; and test "$cmd[3]" = "resource"
+        # proj <subcommand> resource <type>
+        echo $cmd[4]
     else if test $count -ge 3
         # proj <subcommand> <domain>
         echo $cmd[3]
@@ -146,6 +172,9 @@ complete -c proj -n __proj_needs_command -a 'delete' -d 'Delete project director
 
 # Domain completions
 complete -c proj -n __proj_needs_domain -a '(__proj_domains)' -d 'Project domain'
+
+# Resource type completions
+complete -c proj -n __proj_needs_resource_type -a '(__proj_resource_types)' -d 'Resource type'
 
 # Project name completions
 complete -c proj -n __proj_needs_project -a '(__proj_projects (__proj_get_domain))' -d 'Project name'
